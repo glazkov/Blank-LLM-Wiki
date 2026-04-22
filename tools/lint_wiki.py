@@ -88,6 +88,11 @@ def run_structural_lint(root: pathlib.Path) -> List[str]:
         if expected_type and data.get("type") != expected_type:
             issues.append(f"{path.relative_to(root)} has wrong type: {data.get('type')}")
         text = path.read_text(encoding="utf-8")
+        if page_slug(path, wiki_root) == "operations/next-steps":
+            if _next_step_requires_follow_up(text):
+                issues.append(
+                    "wiki/operations/next-steps.md requires a user question or concrete options when the next step is not defined"
+                )
         if data.get("status") == "stable":
             for marker in ("TODO", "TBD", "FIXME"):
                 if marker in text:
@@ -125,6 +130,53 @@ def _source_ref_exists(root: pathlib.Path, known_slugs: set[str], ref: object) -
     if ref.startswith("raw/"):
         return (root / ref).exists()
     return False
+
+
+def _next_step_requires_follow_up(text: str) -> bool:
+    sections = _extract_h2_sections(text)
+    next_step = sections.get("Ближайший шаг", "")
+    user_question = sections.get("Что нужно уточнить у пользователя", "")
+    options = sections.get("Варианты продолжения", "")
+
+    if not _is_placeholder_or_empty(next_step):
+        return False
+    if not _is_placeholder_or_empty(user_question):
+        return False
+    if not _is_placeholder_or_empty(options):
+        return False
+    return True
+
+
+def _extract_h2_sections(text: str) -> dict[str, str]:
+    sections: dict[str, str] = {}
+    current_heading: str | None = None
+    buffer: list[str] = []
+    for line in text.splitlines():
+        if line.startswith("## "):
+            if current_heading is not None:
+                sections[current_heading] = "\n".join(buffer).strip()
+            current_heading = line[3:].strip()
+            buffer = []
+            continue
+        if current_heading is not None:
+            buffer.append(line)
+    if current_heading is not None:
+        sections[current_heading] = "\n".join(buffer).strip()
+    return sections
+
+
+def _is_placeholder_or_empty(value: str) -> bool:
+    normalized = " ".join(value.split()).strip(" -.")
+    if not normalized:
+        return True
+    placeholders = {
+        "Пока не определен",
+        "Пока не определено",
+        "Пока не требуется",
+        "Пока пусто",
+        "Неизвестно",
+    }
+    return normalized in placeholders
 
 
 if __name__ == "__main__":

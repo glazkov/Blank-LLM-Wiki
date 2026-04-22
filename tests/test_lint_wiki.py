@@ -46,7 +46,23 @@ class StructuralLintTest(unittest.TestCase):
             "source_refs: []\n"
             "---\n"
             "\n"
-            "# Next Steps\n",
+            "# Next Steps\n"
+            "\n"
+            "## Ближайший шаг\n"
+            "\n"
+            "- Continue setup.\n"
+            "\n"
+            "## Почему шаг пока не определен\n"
+            "\n"
+            "- Not applicable.\n"
+            "\n"
+            "## Что нужно уточнить у пользователя\n"
+            "\n"
+            "- Пока пусто.\n"
+            "\n"
+            "## Варианты продолжения\n"
+            "\n"
+            "- Continue setup.\n",
             encoding="utf-8",
         )
 
@@ -490,6 +506,138 @@ class StructuralLintTest(unittest.TestCase):
             issues = run_structural_lint(root)
 
             self.assertIn("wiki/concepts/idea.md field updated must be a string", issues)
+
+    def test_reports_empty_next_step_without_question_or_options(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            for relative in [
+                "wiki/concepts",
+                "wiki/sources",
+                "wiki/entities",
+                "wiki/analyses",
+                "wiki/operations",
+            ]:
+                (root / relative).mkdir(parents=True, exist_ok=True)
+            self.write_required_operation_files(root)
+            (root / "wiki/index.md").write_text(
+                "- [[operations/project-intake]]: Intake.\n"
+                "- [[operations/project-status]]: Status.\n"
+                "- [[operations/next-steps]]: Next.\n",
+                encoding="utf-8",
+            )
+            (root / "wiki/log.md").write_text("## [2026-04-22] lint | Test\n", encoding="utf-8")
+            (root / "wiki/overview.md").write_text(
+                "---\n"
+                "title: Overview\n"
+                "type: overview\n"
+                "status: draft\n"
+                "updated: 2026-04-22\n"
+                "summary: Overview.\n"
+                "links: [operations/project-intake, operations/project-status, operations/next-steps]\n"
+                "source_refs: []\n"
+                "---\n"
+                "\n"
+                "# Overview\n",
+                encoding="utf-8",
+            )
+            (root / "wiki/operations/next-steps.md").write_text(
+                "---\n"
+                "title: Next Steps\n"
+                "type: operation\n"
+                "status: draft\n"
+                "updated: 2026-04-22\n"
+                "summary: Next actions.\n"
+                "links: [operations/project-intake, operations/project-status, overview]\n"
+                "source_refs: []\n"
+                "---\n"
+                "\n"
+                "# Next Steps\n"
+                "\n"
+                "## Ближайший шаг\n"
+                "\n"
+                "- Пока не определен.\n"
+                "\n"
+                "## Что нужно уточнить у пользователя\n"
+                "\n"
+                "- Пока пусто.\n"
+                "\n"
+                "## Варианты продолжения\n"
+                "\n"
+                "- Пока пусто.\n",
+                encoding="utf-8",
+            )
+
+            issues = run_structural_lint(root)
+
+            self.assertIn(
+                "wiki/operations/next-steps.md requires a user question or concrete options when the next step is not defined",
+                issues,
+            )
+
+    def test_accepts_empty_next_step_when_question_or_options_exist(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            for relative in [
+                "wiki/concepts",
+                "wiki/sources",
+                "wiki/entities",
+                "wiki/analyses",
+                "wiki/operations",
+            ]:
+                (root / relative).mkdir(parents=True, exist_ok=True)
+            self.write_required_operation_files(root)
+            (root / "wiki/index.md").write_text(
+                "- [[operations/project-intake]]: Intake.\n"
+                "- [[operations/project-status]]: Status.\n"
+                "- [[operations/next-steps]]: Next.\n",
+                encoding="utf-8",
+            )
+            (root / "wiki/log.md").write_text("## [2026-04-22] lint | Test\n", encoding="utf-8")
+            (root / "wiki/overview.md").write_text(
+                "---\n"
+                "title: Overview\n"
+                "type: overview\n"
+                "status: draft\n"
+                "updated: 2026-04-22\n"
+                "summary: Overview.\n"
+                "links: [operations/project-intake, operations/project-status, operations/next-steps]\n"
+                "source_refs: []\n"
+                "---\n"
+                "\n"
+                "# Overview\n",
+                encoding="utf-8",
+            )
+            (root / "wiki/operations/next-steps.md").write_text(
+                "---\n"
+                "title: Next Steps\n"
+                "type: operation\n"
+                "status: draft\n"
+                "updated: 2026-04-22\n"
+                "summary: Next actions.\n"
+                "links: [operations/project-intake, operations/project-status, overview]\n"
+                "source_refs: []\n"
+                "---\n"
+                "\n"
+                "# Next Steps\n"
+                "\n"
+                "## Ближайший шаг\n"
+                "\n"
+                "- Пока не определен.\n"
+                "\n"
+                "## Что нужно уточнить у пользователя\n"
+                "\n"
+                "- Какой вариант продолжения считать приоритетным.\n"
+                "\n"
+                "## Варианты продолжения\n"
+                "\n"
+                "- Уточнить границы проекта.\n"
+                "- Обработать первый источник.\n",
+                encoding="utf-8",
+            )
+
+            issues = run_structural_lint(root)
+
+            self.assertEqual(issues, [])
 
 
 if __name__ == "__main__":

@@ -15,6 +15,8 @@ class AgentsDocTest(unittest.TestCase):
             "git init",
             "не смешивать английские слова с русскими предложениями",
             "новые вводные и контекст проекта",
+            "Если ближайший шаг пуст",
+            "вопрос пользователю",
             "wiki/index.md",
             "wiki/log.md",
             "wiki/operations/project-intake.md",
