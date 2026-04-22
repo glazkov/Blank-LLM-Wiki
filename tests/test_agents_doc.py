@@ -17,6 +17,8 @@ class AgentsDocTest(unittest.TestCase):
             "новые вводные и контекст проекта",
             "Если ближайший шаг пуст",
             "вопрос пользователю",
+            "не накапливай технический долг",
+            "не самым простым путем, а самым верным",
             "wiki/index.md",
             "wiki/log.md",
             "wiki/operations/project-intake.md",

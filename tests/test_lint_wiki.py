@@ -32,7 +32,11 @@ class StructuralLintTest(unittest.TestCase):
             "source_refs: []\n"
             "---\n"
             "\n"
-            "# Project Status\n",
+            "# Project Status\n"
+            "\n"
+            "## Архитектурные риски и пересмотр\n"
+            "\n"
+            "- Пока нет.\n",
             encoding="utf-8",
         )
         (root / "wiki/operations/next-steps.md").write_text(
@@ -638,6 +642,65 @@ class StructuralLintTest(unittest.TestCase):
             issues = run_structural_lint(root)
 
             self.assertEqual(issues, [])
+
+    def test_reports_missing_architecture_review_section_in_project_status(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            for relative in [
+                "wiki/concepts",
+                "wiki/sources",
+                "wiki/entities",
+                "wiki/analyses",
+                "wiki/operations",
+            ]:
+                (root / relative).mkdir(parents=True, exist_ok=True)
+            self.write_required_operation_files(root)
+            (root / "wiki/index.md").write_text(
+                "- [[operations/project-intake]]: Intake.\n"
+                "- [[operations/project-status]]: Status.\n"
+                "- [[operations/next-steps]]: Next.\n",
+                encoding="utf-8",
+            )
+            (root / "wiki/log.md").write_text("## [2026-04-22] lint | Test\n", encoding="utf-8")
+            (root / "wiki/overview.md").write_text(
+                "---\n"
+                "title: Overview\n"
+                "type: overview\n"
+                "status: draft\n"
+                "updated: 2026-04-22\n"
+                "summary: Overview.\n"
+                "links: [operations/project-intake, operations/project-status, operations/next-steps]\n"
+                "source_refs: []\n"
+                "---\n"
+                "\n"
+                "# Overview\n",
+                encoding="utf-8",
+            )
+            (root / "wiki/operations/project-status.md").write_text(
+                "---\n"
+                "title: Project Status\n"
+                "type: operation\n"
+                "status: draft\n"
+                "updated: 2026-04-22\n"
+                "summary: Current project state.\n"
+                "links: [overview, operations/project-intake, operations/next-steps]\n"
+                "source_refs: []\n"
+                "---\n"
+                "\n"
+                "# Project Status\n"
+                "\n"
+                "## Current Goal\n"
+                "\n"
+                "- Adapt project.\n",
+                encoding="utf-8",
+            )
+
+            issues = run_structural_lint(root)
+
+            self.assertIn(
+                "wiki/operations/project-status.md missing required section: Архитектурные риски и пересмотр",
+                issues,
+            )
 
 
 if __name__ == "__main__":

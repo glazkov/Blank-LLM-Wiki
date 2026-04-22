@@ -35,6 +35,9 @@ TYPE_BY_DIR = {
     "analyses": "analysis",
     "operations": "operation",
 }
+REQUIRED_SECTIONS_BY_SLUG = {
+    "operations/project-status": ["Архитектурные риски и пересмотр"],
+}
 LOG_HEADING_RE = re.compile(r"^## \[\d{4}-\d{2}-\d{2}\] (bootstrap|ingest|query|lint|synthesis) \| .+$", re.MULTILINE)
 
 
@@ -88,6 +91,10 @@ def run_structural_lint(root: pathlib.Path) -> List[str]:
         if expected_type and data.get("type") != expected_type:
             issues.append(f"{path.relative_to(root)} has wrong type: {data.get('type')}")
         text = path.read_text(encoding="utf-8")
+        slug = page_slug(path, wiki_root)
+        for section in REQUIRED_SECTIONS_BY_SLUG.get(slug, []):
+            if section not in _extract_h2_sections(text):
+                issues.append(f"{path.relative_to(root)} missing required section: {section}")
         if page_slug(path, wiki_root) == "operations/next-steps":
             if _next_step_requires_follow_up(text):
                 issues.append(
@@ -105,7 +112,7 @@ def run_structural_lint(root: pathlib.Path) -> List[str]:
         for link in extract_wiki_links(text):
             if link not in known_slugs:
                 issues.append(f"{path.relative_to(root)} links to missing page: {link}")
-        if page_slug(path, wiki_root) not in {"overview"} and page_slug(path, wiki_root) not in index_links:
+        if slug not in {"overview"} and slug not in index_links:
             issues.append(f"{path.relative_to(root)} not listed in wiki/index.md")
 
     return issues
