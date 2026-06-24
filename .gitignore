@@ -22,3 +22,4 @@ logs/*.log
 logs/*.txt
 outputs/exports/*
 !outputs/exports/.gitkeep
+public-docs/build/

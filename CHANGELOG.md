@@ -2,6 +2,15 @@
 
 Все заметные изменения шаблона фиксируются в этом файле.
 
+## [Unreleased]
+
+### Added
+
+- Опциональный публичный слой `llm-wiki-public` для публикации выбранных страниц `wiki/` через MkDocs Material.
+- `public-docs-manifest.json` как allowlist публичных страниц.
+- Команды `make public-docs-validate`, `make public-docs-source`, `make public-docs-build`, `make public-docs-serve`, `make public-docs-zip`.
+- Codex-навык `.codex/skills/llm-wiki-public` для упаковки части LLM Wiki в человекочитаемую документацию.
+
 ## [0.1.0] - 2026-04-22
 
 ### Added
