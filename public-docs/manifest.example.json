@@ -1,0 +1,12 @@
+{
+  "site": {
+    "name": "Public Documentation",
+    "description": "Public documentation generated from selected LLM Wiki pages"
+  },
+  "pages": [
+    {
+      "source": "wiki/overview.md",
+      "dest": "index.md"
+    }
+  ]
+}

@@ -43,15 +43,27 @@ class MakefileTest(unittest.TestCase):
 
         self.assertEqual(
             targets[".PHONY"],
-            ["lint", "lint-struct", "lint-semantic", "status", "test"],
+            [
+                "lint",
+                "lint-struct",
+                "lint-semantic",
+                "status",
+                "test",
+                "public-docs-install",
+                "public-docs-validate",
+                "public-docs-source",
+                "public-docs-build",
+                "public-docs-serve",
+                "public-docs-zip",
+            ],
         )
         self.assertEqual(targets["lint"], ["lint-struct", "lint-semantic"])
-        self.assertEqual(targets["lint-struct"], ["python3 tools/lint_wiki.py"])
+        self.assertEqual(targets["lint-struct"], ['"$(PYTHON)" tools/lint_wiki.py'])
         self.assertEqual(
             targets["lint-semantic"],
             [
-                "python3 tools/check_orphans.py",
-                "python3 tools/check_stale.py",
+                '"$(PYTHON)" tools/check_orphans.py',
+                '"$(PYTHON)" tools/check_stale.py',
             ],
         )
         self.assertEqual(
@@ -70,17 +82,28 @@ class MakefileTest(unittest.TestCase):
                 "@cat wiki/operations/next-steps.md",
                 '@echo ""',
                 '@echo "== structural lint =="',
-                "@python3 tools/lint_wiki.py || true",
+                '@"$(PYTHON)" tools/lint_wiki.py || true',
                 '@echo ""',
                 '@echo "== semantic lint =="',
-                "@python3 tools/check_orphans.py || true",
-                "@python3 tools/check_stale.py || true",
+                '@"$(PYTHON)" tools/check_orphans.py || true',
+                '@"$(PYTHON)" tools/check_stale.py || true',
             ],
         )
         self.assertEqual(
             targets["test"],
-            ["python3 -m unittest discover -s tests -v"],
+            ['"$(PYTHON)" -m unittest discover -s tests -v'],
         )
+        self.assertEqual(
+            targets["public-docs-install"],
+            ['"$(PUBLIC_DOCS_PYTHON)" -m pip install -r $(PUBLIC_DOCS_DIR)/requirements.txt'],
+        )
+        self.assertEqual(
+            targets["public-docs-validate"],
+            ['"$(PUBLIC_DOCS_PYTHON)" $(PUBLIC_DOCS_DIR)/tools/validate_public_docs.py'],
+        )
+        self.assertEqual(targets["public-docs-source"], ["public-docs-validate"])
+        self.assertEqual(targets["public-docs-build"], ["public-docs-source"])
+        self.assertEqual(targets["public-docs-serve"], ["public-docs-source"])
 
 
 if __name__ == "__main__":

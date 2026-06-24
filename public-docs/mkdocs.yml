@@ -1,0 +1,60 @@
+site_name: Public Documentation
+site_description: Public documentation generated from selected LLM Wiki pages
+docs_dir: build/docs
+site_dir: build/site
+use_directory_urls: true
+
+nav:
+  - Home: index.md
+
+theme:
+  name: material
+  language: en
+  font: false
+  palette:
+    - scheme: default
+      primary: white
+      accent: blue
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+    - scheme: slate
+      primary: black
+      accent: blue
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.suggest
+
+plugins:
+  - search:
+      lang:
+        - en
+        - ru
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+extra:
+  generator: false
+
+extra_css:
+  - assets/stylesheets/knowledge.css

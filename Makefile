@@ -1,13 +1,17 @@
-.PHONY: lint lint-struct lint-semantic status test
+PYTHON ?= python3
+PUBLIC_DOCS_DIR ?= public-docs
+PUBLIC_DOCS_PYTHON ?= $(PYTHON)
+
+.PHONY: lint lint-struct lint-semantic status test public-docs-install public-docs-validate public-docs-source public-docs-build public-docs-serve public-docs-zip
 
 lint: lint-struct lint-semantic
 
 lint-struct:
-	python3 tools/lint_wiki.py
+	"$(PYTHON)" tools/lint_wiki.py
 
 lint-semantic:
-	python3 tools/check_orphans.py
-	python3 tools/check_stale.py
+	"$(PYTHON)" tools/check_orphans.py
+	"$(PYTHON)" tools/check_stale.py
 
 status:
 	@echo "== wiki files =="
@@ -23,11 +27,30 @@ status:
 	@cat wiki/operations/next-steps.md
 	@echo ""
 	@echo "== structural lint =="
-	@python3 tools/lint_wiki.py || true
+	@"$(PYTHON)" tools/lint_wiki.py || true
 	@echo ""
 	@echo "== semantic lint =="
-	@python3 tools/check_orphans.py || true
-	@python3 tools/check_stale.py || true
+	@"$(PYTHON)" tools/check_orphans.py || true
+	@"$(PYTHON)" tools/check_stale.py || true
 
 test:
-	python3 -m unittest discover -s tests -v
+	"$(PYTHON)" -m unittest discover -s tests -v
+
+public-docs-install:
+	"$(PUBLIC_DOCS_PYTHON)" -m pip install -r $(PUBLIC_DOCS_DIR)/requirements.txt
+
+public-docs-validate:
+	"$(PUBLIC_DOCS_PYTHON)" $(PUBLIC_DOCS_DIR)/tools/validate_public_docs.py
+
+public-docs-source: public-docs-validate
+	"$(PUBLIC_DOCS_PYTHON)" $(PUBLIC_DOCS_DIR)/tools/build_public_docs.py
+
+public-docs-build: public-docs-source
+	cd $(PUBLIC_DOCS_DIR) && "$(PUBLIC_DOCS_PYTHON)" -m mkdocs build --strict
+
+public-docs-serve: public-docs-source
+	cd $(PUBLIC_DOCS_DIR) && "$(PUBLIC_DOCS_PYTHON)" -m mkdocs serve
+
+public-docs-zip: public-docs-build
+	@mkdir -p outputs
+	cd $(PUBLIC_DOCS_DIR)/build/site && COPYFILE_DISABLE=1 zip -r ../../../outputs/public-docs-site.zip . -x '*.DS_Store' '._*' '__MACOSX/*'
