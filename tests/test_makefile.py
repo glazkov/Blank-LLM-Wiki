@@ -104,6 +104,15 @@ class MakefileTest(unittest.TestCase):
         self.assertEqual(targets["public-docs-source"], ["public-docs-validate"])
         self.assertEqual(targets["public-docs-build"], ["public-docs-source"])
         self.assertEqual(targets["public-docs-serve"], ["public-docs-source"])
+        content = (ROOT / "Makefile").read_text(encoding="utf-8")
+        self.assertIn(
+            'cd $(PUBLIC_DOCS_DIR) && "$(PUBLIC_DOCS_PYTHON)" -m mkdocs build --strict -f build/mkdocs.yml',
+            content,
+        )
+        self.assertIn(
+            'cd $(PUBLIC_DOCS_DIR) && "$(PUBLIC_DOCS_PYTHON)" -m mkdocs serve -f build/mkdocs.yml',
+            content,
+        )
 
 
 if __name__ == "__main__":

@@ -47,8 +47,8 @@ def validate_manifest(manifest: dict) -> None:
 
         source_path = Path(source)
         dest_path = Path(dest)
-        if source_path.is_absolute():
-            fail(f"pages[{index}].source must be relative: {source}")
+        if source_path.is_absolute() or ".." in source_path.parts:
+            fail(f"pages[{index}].source must stay inside project: {source}")
         if dest_path.is_absolute() or ".." in dest_path.parts:
             fail(f"pages[{index}].dest must stay inside public docs: {dest}")
         if dest in seen_dest:

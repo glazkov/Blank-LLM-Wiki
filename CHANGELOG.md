@@ -10,6 +10,16 @@
 - `public-docs-manifest.json` как allowlist публичных страниц.
 - Команды `make public-docs-validate`, `make public-docs-source`, `make public-docs-build`, `make public-docs-serve`, `make public-docs-zip`.
 - Codex-навык `.codex/skills/llm-wiki-public` для упаковки части LLM Wiki в человекочитаемую документацию.
+- Отдельная публичная стартовая страница `public-docs/pages/index.md`, не завязанная на служебный `wiki/overview.md`.
+
+### Changed
+
+- `public-docs-build` и `public-docs-serve` теперь используют сгенерированный `mkdocs.yml` из `public-docs/build/`.
+- `site.name` и `site.description` из `public-docs-manifest.json` теперь попадают в сгенерированную конфигурацию MkDocs.
+
+### Fixed
+
+- Валидация публичного манифеста теперь запрещает `..` в `source`, чтобы источник не мог выйти за пределы проекта.
 
 ## [0.1.0] - 2026-04-22
 

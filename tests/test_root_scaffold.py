@@ -12,6 +12,7 @@ class RootScaffoldTest(unittest.TestCase):
             ROOT / "README.md",
             ROOT / ".gitignore",
             ROOT / "public-docs-manifest.json",
+            ROOT / "public-docs" / "pages" / "index.md",
             ROOT / "public-docs" / "mkdocs.yml",
             ROOT / "public-docs" / "requirements.txt",
             ROOT / "public-docs" / "tools" / "build_public_docs.py",

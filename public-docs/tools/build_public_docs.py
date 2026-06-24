@@ -12,9 +12,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 PUBLIC_DOCS = ROOT / "public-docs"
+BUILD = PUBLIC_DOCS / "build"
 DOCS = PUBLIC_DOCS / "build" / "docs"
 ASSETS = PUBLIC_DOCS / "assets"
 MANIFEST = ROOT / "public-docs-manifest.json"
+MKDOCS_TEMPLATE = PUBLIC_DOCS / "mkdocs.yml"
+MKDOCS_BUILD = BUILD / "mkdocs.yml"
 
 WIKILINK_RE = re.compile(r"\[\[([^\]|]+)(?:\|([^\]]+))?\]\]")
 FRONTMATTER_RE = re.compile(r"\A---\n.*?\n---\n", re.DOTALL)
@@ -56,6 +59,25 @@ def load_manifest() -> dict:
     return json.loads(MANIFEST.read_text(encoding="utf-8"))
 
 
+def render_mkdocs_config(manifest: dict) -> None:
+    site = manifest.get("site", {})
+    site_name = site.get("name", "Public Documentation")
+    site_description = site.get("description", "Public documentation generated from selected LLM Wiki pages")
+    text = MKDOCS_TEMPLATE.read_text(encoding="utf-8")
+    text = re.sub(r"^site_name: .*$", f"site_name: {site_name}", text, count=1, flags=re.MULTILINE)
+    text = re.sub(
+        r"^site_description: .*$",
+        f"site_description: {site_description}",
+        text,
+        count=1,
+        flags=re.MULTILINE,
+    )
+    text = re.sub(r"^docs_dir: .*$", "docs_dir: docs", text, count=1, flags=re.MULTILINE)
+    text = re.sub(r"^site_dir: .*$", "site_dir: site", text, count=1, flags=re.MULTILINE)
+    MKDOCS_BUILD.parent.mkdir(parents=True, exist_ok=True)
+    MKDOCS_BUILD.write_text(text, encoding="utf-8")
+
+
 def convert_links(
     text: str,
     dest_file: Path,
@@ -77,6 +99,7 @@ def convert_links(
 
 def main() -> None:
     manifest = load_manifest()
+    render_mkdocs_config(manifest)
     pages = manifest["pages"]
     public_dest_by_source = {
         page["source"]: Path(page["dest"])

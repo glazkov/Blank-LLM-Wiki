@@ -1,11 +1,11 @@
 {
   "site": {
-    "name": "Public Documentation",
-    "description": "Public documentation generated from selected LLM Wiki pages"
+    "name": "LLM Wiki Template",
+    "description": "A project template for durable LLM-maintained knowledge bases"
   },
   "pages": [
     {
-      "source": "wiki/overview.md",
+      "source": "public-docs/pages/index.md",
       "dest": "index.md"
     }
   ]

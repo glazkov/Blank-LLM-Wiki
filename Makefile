@@ -46,10 +46,10 @@ public-docs-source: public-docs-validate
 	"$(PUBLIC_DOCS_PYTHON)" $(PUBLIC_DOCS_DIR)/tools/build_public_docs.py
 
 public-docs-build: public-docs-source
-	cd $(PUBLIC_DOCS_DIR) && "$(PUBLIC_DOCS_PYTHON)" -m mkdocs build --strict
+	cd $(PUBLIC_DOCS_DIR) && "$(PUBLIC_DOCS_PYTHON)" -m mkdocs build --strict -f build/mkdocs.yml
 
 public-docs-serve: public-docs-source
-	cd $(PUBLIC_DOCS_DIR) && "$(PUBLIC_DOCS_PYTHON)" -m mkdocs serve
+	cd $(PUBLIC_DOCS_DIR) && "$(PUBLIC_DOCS_PYTHON)" -m mkdocs serve -f build/mkdocs.yml
 
 public-docs-zip: public-docs-build
 	@mkdir -p outputs
